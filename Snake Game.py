@@ -4,7 +4,7 @@ import time
 import random
 
 SIZE = 40
-BACKGROUND_COLOR = (157,50,168)
+BACKGROUND_COLOR = (0,0,0)
 
 class Fruit:
     def __init__(self, screen):
@@ -18,8 +18,8 @@ class Fruit:
         pygame.display.flip()
 
     def move(self):
-        self.x = random.randint(1,24)*SIZE
-        self.y = random.randint(1,19)*SIZE
+        self.x = random.randint(1,10)*SIZE
+        self.y = random.randint(1,8)*SIZE
 
 class Snake:
     def __init__(self, parent_screen):
@@ -28,8 +28,8 @@ class Snake:
         self.direction = 'down'
 
         self.length = 1
-        self.x = [40]
-        self.y = [40]
+        self.x = [SIZE]
+        self.y = [SIZE]
 
     def move_left(self):
         self.direction = 'left'
@@ -63,7 +63,6 @@ class Snake:
 
     def draw(self):
         self.parent_screen.fill(BACKGROUND_COLOR)
-
         for i in range(self.length):
             self.parent_screen.blit(self.image, (self.x[i], self.y[i]))
         pygame.display.flip()
@@ -74,10 +73,11 @@ class Snake:
         self.y.append(-1)
 
 class Game:
+
     def __init__(self):
         pygame.init()
         pygame.display.set_caption("Snake Game")
-        self.surface = pygame.display.set_mode((1000, 800))
+        self.surface = pygame.display.set_mode((800, 600))
         self.snake = Snake(self.surface)
         self.snake.draw()
         self.apple = Fruit(self.surface)
@@ -92,6 +92,8 @@ class Game:
         if x1 >= x2 and x1 < x2 + SIZE:
             if y1 >= y2 and y1 < y2 + SIZE:
                 return True
+
+
         return False
 
     def play(self):
@@ -110,18 +112,24 @@ class Game:
             if self.is_collision(self.snake.x[0], self.snake.y[0], self.snake.x[i], self.snake.y[i]):
                 raise "Collision Occured"
 
+        # collision with board
+        if self.snake.x[0] == 0 or self.snake.x[0] == 800 or self.snake.y[0] == 0 or self.snake.y[0] == 600:
+            raise "Collision Occured"
+
+
+
     def display_score(self):
-        font = pygame.font.SysFont('arial',30)
-        score = font.render(f"Score: {self.snake.length}",True,(200,200,200))
-        self.surface.blit(score,(850,10))
+        font = pygame.font.SysFont('bold',30)
+        score = font.render(f"Score: {self.snake.length-1}",True,(255,255,255))
+        self.surface.blit(score,(300,10))
 
     def show_game_over(self):
         self.surface.fill(BACKGROUND_COLOR)
         font = pygame.font.SysFont('arial', 30)
-        line1 = font.render(f"Game is over! Your score is {self.snake.length}", True, (255, 255, 255))
-        self.surface.blit(line1, (200, 300))
+        line1 = font.render(f"Game is over! Your score is {self.snake.length-1}", True, (255, 255, 255))
+        self.surface.blit(line1, (100, 150))
         line2 = font.render("To play again press Enter. To exit press Escape!", True, (255, 255, 255))
-        self.surface.blit(line2, (200, 350))
+        self.surface.blit(line2, (100, 200))
 
         pygame.display.flip()
 
@@ -154,7 +162,6 @@ class Game:
                 elif event.type == QUIT:
                     running = False
             try:
-
                 if not pause:
                     self.play()
 
@@ -164,6 +171,7 @@ class Game:
                 self.reset()
 
             time.sleep(.25)
+
 
 if __name__ == '__main__':
     game = Game()
